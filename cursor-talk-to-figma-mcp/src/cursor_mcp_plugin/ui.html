@@ -1,171 +1,392 @@
 <!DOCTYPE html>
-<html>
+<html style="height: 100%;">
   <head>
     <meta charset="utf-8" />
     <title>Cursor MCP Plugin</title>
     <style>
+      :root {
+        --primary-bg: #1A1F2C;
+        --secondary-bg: #403E43;
+        --panel-bg: rgba(34, 31, 38, 0.8);
+        --accent-gradient: linear-gradient(135deg, #8B5CF6, #D946EF);
+        --text-primary: #F9FAFB;
+        --text-secondary: #AAADB0;
+        --border-color: rgba(139, 92, 246, 0.2);
+      }
+
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           Helvetica, Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        color: #e0e0e0;
-        background-color: #1e1e1e;
+        color: var(--text-primary);
+        background-color: var(--primary-bg);
+        display: flex;
+        flex-direction: column;
       }
+
       .container {
         display: flex;
         flex-direction: column;
         height: 100%;
+        width: 100%;
+        backdrop-filter: blur(10px);
+        background: var(--panel-bg);
       }
-      h1 {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 10px;
-        color: #ffffff;
+
+      .content-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        width: 100%;
       }
-      h2 {
-        font-size: 14px;
-        font-weight: 600;
-        margin-top: 20px;
-        margin-bottom: 8px;
-        color: #ffffff;
-      }
-      button {
-        background-color: #18a0fb;
-        border: none;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.2s;
-      }
-      button:hover {
-        background-color: #0d8ee0;
-      }
-      button.secondary {
-        background-color: #3d3d3d;
-        color: #e0e0e0;
-      }
-      button.secondary:hover {
-        background-color: #4d4d4d;
-      }
-      button:disabled {
-        background-color: #333333;
-        color: #666666;
-        cursor: not-allowed;
-      }
-      input {
-        border: 1px solid #444444;
-        border-radius: 4px;
-        padding: 8px;
-        margin-bottom: 12px;
-        font-size: 14px;
+
+      .section {
+        padding: 16px;
+        border-bottom: 1px solid var(--border-color);
         width: 100%;
         box-sizing: border-box;
-        background-color: #2d2d2d;
-        color: #e0e0e0;
       }
-      label {
-        display: block;
-        margin-bottom: 4px;
-        font-size: 12px;
-        font-weight: 500;
-        color: #cccccc;
-      }
-      .status {
-        margin-top: 16px;
-        padding: 12px;
-        border-radius: 6px;
-        font-size: 14px;
-      }
-      .status.connected {
-        background-color: #1a472a;
-        color: #4ade80;
-      }
-      .status.disconnected {
-        background-color: #471a1a;
-        color: #ff9999;
-      }
-      .status.info {
-        background-color: #1a3147;
-        color: #66b3ff;
-      }
-      .section {
-        margin-bottom: 24px;
-      }
-      .hidden {
-        display: none;
-      }
-      .logo {
-        width: 50px;
-        height: 50px;
-      }
+
       .header {
         display: flex;
         align-items: center;
-        margin-bottom: 16px;
+        padding: 16px;
+        background: var(--accent-gradient);
+        position: relative;
+        border-bottom: 1px solid var(--border-color);
+        width: 100%;
+        box-sizing: border-box;
       }
-      .header-text {
-        margin-left: 12px;
+
+      .header-logo {
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        margin-right: 12px;
       }
+
       .header-text h1 {
         margin: 0;
         font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
       }
+
       .header-text p {
         margin: 4px 0 0 0;
         font-size: 12px;
-        color: #999999;
+        color: rgba(255, 255, 255, 0.8);
       }
+
       .tabs {
         display: flex;
-        border-bottom: 1px solid #444444;
-        margin-bottom: 16px;
+        background: var(--secondary-bg);
+        padding: 0;
+        border-bottom: 1px solid var(--border-color);
+        width: 100%;
       }
+
       .tab {
-        padding: 8px 16px;
+        flex: 1;
+        text-align: center;
+        padding: 12px 20px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
-        color: #999999;
+        color: var(--text-secondary);
+        position: relative;
+        transition: all 0.3s ease;
       }
+
+      .tab:hover {
+        color: var(--text-primary);
+        background: rgba(139, 92, 246, 0.1);
+      }
+
       .tab.active {
-        border-bottom: 2px solid #18a0fb;
-        color: #18a0fb;
+        color: #8B5CF6;
       }
+
+      .tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--accent-gradient);
+      }
+
       .tab-content {
-        display: none;
+        height: 100%;
+        width: 100%;
       }
+
       .tab-content.active {
         display: block;
       }
-      .link {
-        color: #18a0fb;
-        text-decoration: none;
+
+      button {
+        background: var(--accent-gradient);
+        border: none;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 8px;
         cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
       }
-      .link:hover {
-        text-decoration: underline;
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
       }
-      .header-logo {
-        padding: 16px;
-        border-radius: 16px;
-        background-color: #333;
+
+      button.secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
       }
-      .header-logo-image {
-        width: 24px;
-        height: 24px;
-        object-fit: contain;
+
+      button:disabled {
+        background: var(--secondary-bg);
+        color: var(--text-secondary);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
       }
+
+      input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px 16px;
+        color: var(--text-primary);
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      .status {
+        margin: 16px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        backdrop-filter: blur(5px);
+      }
+
+      .status.connected {
+        background: rgba(74, 222, 128, 0.1);
+        color: #4ade80;
+        border: 1px solid rgba(74, 222, 128, 0.2);
+      }
+
+      .status.disconnected {
+        background: rgba(255, 153, 153, 0.1);
+        color: #ff9999;
+        border: 1px solid rgba(255, 153, 153, 0.2);
+      }
+
+      .status.info {
+        background: rgba(102, 179, 255, 0.1);
+        color: #66b3ff;
+        border: 1px solid rgba(102, 179, 255, 0.2);
+      }
+
       /* Progress styles */
+      #progress-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      #progress-bar {
+        background: var(--accent-gradient);
+        height: 6px;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
+
       .operation-complete {
         color: #4ade80;
       }
+
       .operation-error {
         color: #ff9999;
+      }
+
+      .link {
+        color: #8B5CF6;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .link:hover {
+        color: #D946EF;
+        text-decoration: none;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--primary-bg);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--secondary-bg);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #8B5CF6;
+      }
+
+      .tool-category {
+        margin-bottom: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .tool-category-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background: rgba(139, 92, 246, 0.1);
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .tool-category-header .icon {
+        margin-right: 8px;
+        font-size: 16px;
+      }
+
+      .tool-list {
+        padding: 8px 0;
+      }
+
+      .tool-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 16px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .tool-item:hover {
+        background: rgba(139, 92, 246, 0.1);
+        color: var(--text-primary);
+      }
+
+      .icon-info {
+        font-size: 14px;
+        opacity: 0.7;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Design Memory AI Styles */
+      .ai-section {
+        padding: 16px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .ai-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        font-size: 13px;
+      }
+
+      .ai-status.success {
+        color: #4ade80;
+      }
+
+      .ai-status.pending {
+        color: var(--text-secondary);
+      }
+
+      .prompt-input {
+        width: 100%;
+        min-height: 80px;
+        resize: vertical;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 12px;
+        color: var(--text-primary);
+        font-size: 14px;
+        font-family: inherit;
+        margin-top: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .prompt-input:focus {
+        outline: none;
+        border-color: #8B5CF6;
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+      }
+
+      .output-display {
+        margin-top: 16px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        min-height: 100px;
+      }
+
+      .model-info {
+        text-align: center;
+        padding: 12px;
+        color: var(--text-secondary);
+        font-size: 11px;
+        opacity: 0.7;
+      }
+
+      .settings-icon {
+        margin-left: auto;
+        padding: 8px;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+      }
+
+      .settings-icon:hover {
+        opacity: 1;
       }
     </style>
   </head>
@@ -176,79 +397,160 @@
           <img
             class="header-logo-image"
             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAMAAAANIilAAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAJcEhZcwAAEJwAABCcASbNOjQAAAB1UExURUdwTP////////////////39/f////////////////////////////7+/v////////////39/f////////////////////////////////////////////////////39/fn5+ejo6P///+rq6uXl5f////Ly8gf4a04AAAAkdFJOUwAOdkZCfz04zIgbT0pkIagnm7C9b6C2LWqSxBMyB11W2Ovsy3D12ZYAAALtSURBVEjHndcJt6ogEADgXNAUcWlxSQVN3/3/P/EBAgJpWdM9p5ue78xANE2n05vIUduffgvn1oA0bX+hvRc1DYjTPHe+tiGIoqhx4zTNq/y72lMURQtmqasuPc4dAmgwfWuZrqquiw8uNnC5BRJT3YXhIZ7Xris0oLjlmOrArz7VHpOb6wpNee0ITVMHvvd25/qgvtFwla8dpxV7xnTi7dbed7iuTY16lZoV7iXQb3cqRgjVgoviKTZSUw2719pbD2OEVu5yjnqeOpZ75lMMobVzfUcwC6lrofGJpdb3jGtj6TkkNKRWtXMsU+ciNdfQUwe+zZ7/vo1CYYgv39G/kShMS6mHL+g8F96K2Uqi52E6j3DFnsc4uR/hMwugYd9bOLoeSTvPE1yx4/sLh9B9fKbziHVM3z/G+dKb5wdKdysxsNCc4+2l/yk7EnrOVhwGBt9auqJ0t9gR13C4cl77bdil88SPuK9jxrXksHjab48Mwo+4ha3aSbZJ52JpC4GFbY7OdsVst4Lls/mKZe1y6fXTonS3RFsIN7C5dAJsO+WiI21jbd8xesFEtoUdLLjH+qGNJ9WRuj3MOOQNycaV6khvsLc0MxsD2Uq7bhcHuBZh4rFdujjT1c6GkaXtszCx3sW3MRRfNjwiI7EjGjGfFjZwUgM9CuNggqRVXz+vOGDTBOCP5UnHE73ghjK1jYNlEIma9UnHBb/qdkvq1MSQjk4yCvGk4UneQylLbWAIio3I1t26q4sNTuM01tqQe9+My5pYv9wk8Ypv92w7JpXYulGoD8aJ3C/bUUp8tW5EuTa2oXI7ZGLzahZYE0l03QqZWI8Lfh1lw+zxEoNIrF8Dm/NQT8rzgz+WP/oQmL6Ud4pud/4DZzMWPKjXZfJufOyiVzzKV4/609yelDaWiZsDc6+DSwOLxNqxeD/6Ah3zf674+Kyf3xUeDi3WDFIKzCpOv/5phB4MD+cs/OWXVdych/GBf/xJd4pL9+1i/wOElMO5v/co4wAAAABJRU5ErkJggg=="
+            style="width: 24px; height: 24px; object-fit: contain;"
           />
         </div>
         <div class="header-text">
-          <h1>Cursor Talk To Figma Plugin</h1>
-          <p>Connect Figma to Cursor AI using MCP</p>
+          <h1>Design Memory AI</h1>
+          <p>AI-Powered Design Assistant</p>
         </div>
+        <div class="settings-icon">⚙️</div>
       </div>
 
       <div class="tabs">
-        <div id="tab-connection" class="tab active">Connection</div>
+        <div id="tab-ai" class="tab active">AI Assistant</div>
+        <div id="tab-connection" class="tab">Connection</div>
+        <div id="tab-tools" class="tab">Tools</div>
         <div id="tab-about" class="tab">About</div>
       </div>
 
-      <div id="content-connection" class="tab-content active">
-        <div class="section">
-          <label for="port">WebSocket Server Port</label>
-          <div style="display: flex; gap: 8px">
-            <input
-              type="number"
-              id="port"
-              placeholder="3055"
-              value="3055"
-              min="1024"
-              max="65535"
-            />
-            <button id="btn-connect" class="primary">Connect</button>
+      <div class="content-wrapper">
+        <div id="content-ai" class="tab-content active">
+          <div class="ai-section">
+            <button id="btn-digest" class="primary">Digest Style System</button>
+            <div id="digest-status" class="ai-status pending">
+              <span>⏳</span>
+              <span>Waiting to digest style system...</span>
+            </div>
+          </div>
+
+          <div class="ai-section">
+            <label for="prompt-input">Describe a component to generate</label>
+            <textarea
+              id="prompt-input"
+              class="prompt-input"
+              placeholder="e.g. Create a modern card component with rounded corners and a gradient border..."
+            ></textarea>
+            <button id="btn-generate" class="primary" style="margin-top: 12px; width: 100%;">
+              Generate Component
+            </button>
+          </div>
+
+          <div class="ai-section">
+            <div class="output-display">
+              <p style="color: var(--text-secondary);">AI response will appear here...</p>
+            </div>
+          </div>
+
+          <div class="model-info">
+            Powered by DeepSeek Coder
           </div>
         </div>
 
-        <div id="connection-status" class="status disconnected">
-          Not connected to Cursor MCP server
-        </div>
-
-        <div class="section">
-          <button id="btn-disconnect" class="secondary" disabled>
-            Disconnect
-          </button>
-        </div>
-        
-        <!-- Add Progress Bar Section -->
-        <div id="progress-container" class="section hidden">
-          <h2>Operation Progress</h2>
-          <div id="progress-message">No operation in progress</div>
-          <div style="width: 100%; background-color: #444; border-radius: 4px; margin-top: 8px;">
-            <div id="progress-bar" style="width: 0%; height: 8px; background-color: #18a0fb; border-radius: 4px; transition: width 0.3s;"></div>
+        <div id="content-connection" class="tab-content">
+          <div class="section">
+            <label for="port">WebSocket Server Port</label>
+            <div style="display: flex; gap: 8px; width: 100%;">
+              <input
+                type="number"
+                id="port"
+                placeholder="3055"
+                value="3055"
+                min="1024"
+                max="65535"
+                style="flex: 1;"
+              />
+              <button id="btn-connect" class="primary">Connect</button>
+            </div>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px;">
-            <div id="progress-status">Not started</div>
-            <div id="progress-percentage">0%</div>
+
+          <div id="connection-status" class="status disconnected">
+            Not connected to Cursor MCP server
+          </div>
+
+          <div class="section">
+            <button id="btn-disconnect" class="secondary" disabled>
+              Disconnect
+            </button>
+          </div>
+          
+          <div id="progress-container" class="section hidden">
+            <h2>Operation Progress</h2>
+            <div id="progress-message">No operation in progress</div>
+            <div style="width: 100%; background: rgba(255, 255, 255, 0.05); border-radius: 4px; margin-top: 8px;">
+              <div id="progress-bar" style="width: 0%; height: 6px; background: var(--accent-gradient); border-radius: 3px;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--text-secondary);">
+              <div id="progress-status">Not started</div>
+              <div id="progress-percentage">0%</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div id="content-about" class="tab-content">
-        <div class="section">
-          <h2>About Cursor Talk To Figma Plugin</h2>
-          <p>
-            This plugin allows Cursor AI to communicate with Figma, enabling
-            AI-assisted design operations. created by
-            <a
-              class="link"
-              onclick="window.open(`https://github.com/sonnylazuardi`, '_blank')"
-              >Sonny</a
-            >
-          </p>
-          <p>Version: 1.0.0</p>
+        <div id="content-tools" class="tab-content">
+          <div class="section">
+            <h2>Available Tools</h2>
+            <div class="tool-category">
+              <div class="tool-category-header">
+                <i class="icon">📝</i>
+                <span>Document & Selection</span>
+              </div>
+              <div class="tool-list">
+                <div class="tool-item">
+                  <span>Get Document Info</span>
+                  <i class="icon-info">ℹ️</i>
+                </div>
+                <div class="tool-item">
+                  <span>Get Selection</span>
+                  <i class="icon-info">ℹ️</i>
+                </div>
+              </div>
+            </div>
 
-          <h2>How to Use</h2>
-          <ol>
-            <li>Make sure the MCP server is running in Cursor</li>
-            <li>Connect to the server using the port number (default: 3055)</li>
-            <li>Once connected, you can interact with Figma through Cursor</li>
-          </ol>
+            <div class="tool-category">
+              <div class="tool-category-header">
+                <i class="icon">🎨</i>
+                <span>Creation Tools</span>
+              </div>
+              <div class="tool-list">
+                <div class="tool-item">
+                  <span>Create Rectangle</span>
+                  <i class="icon-info">ℹ️</i>
+                </div>
+                <div class="tool-item">
+                  <span>Create Frame</span>
+                  <i class="icon-info">ℹ️</i>
+                </div>
+                <div class="tool-item">
+                  <span>Create Text</span>
+                  <i class="icon-info">ℹ️</i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="content-about" class="tab-content">
+          <div class="section">
+            <h2>About Cursor Talk To Figma</h2>
+            <p>
+              This plugin allows Cursor AI to communicate with Figma, enabling
+              AI-assisted design operations. Created by
+              <a
+                class="link"
+                onclick="window.open('https://github.com/sonnylazuardi', '_blank')"
+                >Sonny</a
+              >
+            </p>
+            <p style="color: var(--text-secondary);">Version: 1.0.0</p>
+
+            <h2>How to Use</h2>
+            <ol style="color: var(--text-secondary); padding-left: 20px;">
+              <li>Make sure the MCP server is running in Cursor</li>
+              <li>Connect to the server using the port number (default: 3055)</li>
+              <li>Once connected, you can interact with Figma through Cursor</li>
+            </ol>
+          </div>
         </div>
       </div>
     </div>
@@ -279,6 +581,56 @@
       const progressMessage = document.getElementById("progress-message");
       const progressStatus = document.getElementById("progress-status");
       const progressPercentage = document.getElementById("progress-percentage");
+
+      // AI Feature Elements
+      const digestButton = document.getElementById("btn-digest");
+      const digestStatus = document.getElementById("digest-status");
+      const generateButton = document.getElementById("btn-generate");
+      const promptInput = document.getElementById("prompt-input");
+      const outputDisplay = document.querySelector(".output-display");
+
+      // AI Feature Functions
+      async function digestStyleSystem() {
+        try {
+          digestButton.disabled = true;
+          digestStatus.className = "ai-status pending";
+          digestStatus.innerHTML = `<span>🔄</span><span>Digesting style system...</span>`;
+
+          // Send command to digest style system
+          const result = await sendCommand("digest_styles", {});
+
+          digestStatus.className = "ai-status success";
+          digestStatus.innerHTML = `<span>✅</span><span>Style system digested successfully!</span>`;
+        } catch (error) {
+          digestStatus.className = "ai-status error";
+          digestStatus.innerHTML = `<span>❌</span><span>Error: ${error.message}</span>`;
+        } finally {
+          digestButton.disabled = false;
+        }
+      }
+
+      async function generateComponent() {
+        try {
+          const prompt = promptInput.value.trim();
+          if (!prompt) {
+            throw new Error("Please enter a component description");
+          }
+
+          generateButton.disabled = true;
+          outputDisplay.innerHTML = `<p style="color: var(--text-secondary);">Generating component...</p>`;
+
+          // Send command to generate component
+          const result = await sendCommand("generate_component", {
+            prompt: prompt
+          });
+
+          outputDisplay.innerHTML = `<pre style="color: var(--text-primary); white-space: pre-wrap;">${result.response}</pre>`;
+        } catch (error) {
+          outputDisplay.innerHTML = `<p style="color: #ff9999;">Error: ${error.message}</p>`;
+        } finally {
+          generateButton.disabled = false;
+        }
+      }
 
       // Initialize UI
       function updateConnectionStatus(isConnected, message) {
@@ -650,6 +1002,16 @@
             break;
         }
       };
+
+      // AI Feature Event Listeners
+      digestButton.addEventListener("click", digestStyleSystem);
+      generateButton.addEventListener("click", generateComponent);
+
+      // Settings Icon Event Listener
+      document.querySelector(".settings-icon").addEventListener("click", () => {
+        // TODO: Implement settings panel
+        console.log("Settings clicked");
+      });
     </script>
   </body>
 </html>
